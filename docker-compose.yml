@@ -22,6 +22,11 @@ services:
   redis-master:
     container_name: redis-master
     image: redis:8.2.5-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "muyfacil", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     volumes:
       - "./redis/master/redis.conf:/etc/redis/redis.conf"
       - redis-master:/data
@@ -29,11 +34,28 @@ services:
   redis-slave:
     container_name: redis-slave
     image: redis:8.2.5-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "muyfacil", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
     volumes:
       - "./redis/slave/redis.conf:/etc/redis/redis.conf"
       - redis-slave:/data
     command: redis-server /etc/redis/redis.conf
-
+  redis-sentinel:
+    container_name: redis-sentinel
+    image: bitnami/redis-sentinel:latest
+    environment:
+      - REDIS_SENTINEL_MASTER_NAME=mymaster
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_MASTER_PASSWORD=muyfacil
+      - REDIS_SENTINEL_DOWN_AFTER_MILLISECONDS=5000
+    depends_on:
+      redis-master:
+        condition: service_healthy
+      redis-slave:
+        condition: service_healthy
 volumes:
   redis-master:
   redis-slave:
