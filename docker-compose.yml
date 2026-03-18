@@ -1,0 +1,18 @@
+services:
+  haproxy1-ssl:
+    build: ./haproxy1-ssl
+    volumes:
+      - "./haproxy1-ssl/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"
+    ports:
+      - "8080:443"
+  haproxy1-int:
+    build: ./haproxy1-int
+    volumes:
+      - "./haproxy1-int/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"
+    ports:
+      - "443:80"
+  java1:
+    image: nginx:latest   
+  java2:
+    image: nginx:latest
+
