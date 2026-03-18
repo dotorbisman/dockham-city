@@ -1,6 +1,6 @@
 services:
   haproxy1-ssl:
-    container_name: haprox1-ssl
+    container_name: haproxy1-ssl
     build: ./haproxy1-ssl
     volumes:
       - "./haproxy1-ssl/haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg"
