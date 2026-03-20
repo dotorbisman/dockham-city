@@ -63,7 +63,20 @@ services:
       - "8983:8983"
     volumes:
       - solr:/var/solr
+  webdav:
+    container_name: webdav
+    build: ./webdav
+    ports:
+      - "8081:80"
+    volumes:
+      - webdav:/usr/local/apache2/htdocs/
+      - webdav-up:/usr/local/apache2/uploads
+      - webdav-var:/usr/local/apache2/var
+  
 volumes:
   redis-master:
   redis-slave:
   solr:
+  webdav:
+  webdav-up:
+  webdav-var:
