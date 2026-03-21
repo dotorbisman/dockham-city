@@ -95,18 +95,4 @@ curl -v -T archivo.txt --digest -u admin:password http://localhost:8081/uploads/
 
 
 
-
-
-# Estado actual del **docker ps**
-
- 
-* haproxy1-ssl
-* haproxy1-int
-* java1
-* java2
-* redis-master
-* redis-slave
-* redis-sentinel
-* solr
-
 ![Arquitectura Docker GDE2](docs/arq.png)
