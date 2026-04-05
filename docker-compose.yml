@@ -97,8 +97,22 @@ services:
     volumes:
       - ldap_data:/var/lib/ldap
       - ldap_config:/etc/ldap/slapd.d
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./prome/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - prome:/prometheus
+  ha1-int_exporter:
+    container_name: ha1-int_exporter
+    image:  quay.io/prometheus/haproxy-exporter:latest
+    ports:
+      - "9101:9101"
+    command: --haproxy.scrape-uri="http://haproxy1-int:8404/stats"
 
-  
+      
 volumes:
   redis-master:
   redis-slave:
@@ -108,3 +122,4 @@ volumes:
   webdav-var:
   ldap_data:
   ldap_config:
+  prome:

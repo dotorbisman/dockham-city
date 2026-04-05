@@ -187,6 +187,97 @@ frontend stats
 
 ---
 
+## Observabilidad — Prometheus
+
+Se incorporó un stack de observabilidad compuesto por dos contenedores: un exporter que traduce las métricas de HAProxy al formato de Prometheus, y Prometheus mismo que las recolecta.
+
+### Conceptos clave
+
+**Exporter:** Prometheus no puede leer métricas de cualquier servicio directamente. Necesita que estén expuestas en un endpoint HTTP con un formato específico (`/metrics`). Los servicios que no hablan ese formato necesitan un proceso intermediario llamado exporter que traduce sus métricas nativas al formato que Prometheus entiende.
+
+**Scraping:** Prometheus funciona en modo pull — es él quien va a buscar las métricas a cada target en el intervalo configurado. Si un target no responde, lo marca como `down` y reintenta. No rompe el proceso.
+
+**Pipeline de observabilidad:**
+```
+haproxy1-int (:8404/stats) → ha1-int_exporter (:9101/metrics) → prometheus (:9090)
+```
+
+### ha1-int_exporter
+
+**Imagen:** `quay.io/prometheus/haproxy-exporter`  
+**Puerto:** `9101` (solo red interna Docker)
+
+El exporter se conecta a las stats de HAProxy y las traduce al formato Prometheus. Se configura mediante el argumento `--haproxy.scrape-uri`:
+
+```yaml
+ha1-int_exporter:
+  container_name: ha1-int_exporter
+  image: quay.io/prometheus/haproxy-exporter:latest
+  ports:
+    - "9101:9101"
+  command: --haproxy.scrape-uri="http://haproxy1-int:8404/stats"
+```
+
+No requiere `depends_on` — si HAProxy no está disponible al arrancar, reintenta en el próximo ciclo.
+
+**Verificar que el exporter expone métricas:**
+```bash
+curl localhost:9101/metrics
+# Debe mostrar haproxy_up 1
+```
+
+La métrica clave para confirmar que el exporter llega a HAProxy es:
+```
+haproxy_up 1
+```
+
+### prometheus
+
+**Imagen:** `prom/prometheus`  
+**Puerto:** `9090→9090`
+
+La configuración se monta como bind mount desde `./prome/prometheus.yml`. El volumen de datos usa el path correcto para esta imagen (`/prometheus`).
+
+```yaml
+prometheus:
+  container_name: prometheus
+  image: prom/prometheus
+  ports:
+    - "9090:9090"
+  volumes:
+    - "./prome/prometheus.yml:/etc/prometheus/prometheus.yml"
+    - prome:/prometheus
+```
+
+**prometheus.yml:**
+```yaml
+global:
+  scrape_interval: 15s
+  external_labels:
+    monitor: 'codelab-monitor'
+
+scrape_configs:
+  - job_name: 'haprox1-int'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['ha1-int_exporter:9101']
+```
+
+**Reload en caliente** (sin reiniciar el contenedor):
+```bash
+curl -X POST http://localhost:9090/-/reload
+```
+
+**Verificar targets activos:**  
+`http://localhost:9090/targets` — el job `haprox1-int` debe aparecer con estado `UP`.
+
+**Notas sobre la imagen:**
+- No existe Docker Official Image para Prometheus en Docker Hub. La imagen oficial la publica el propio proyecto bajo la organización `prom` (`prom/prometheus`).
+- La imagen `bitnami/prometheus` fue descontinuada — no está disponible en Docker Hub.
+- El path de datos de `prom/prometheus` es `/prometheus`, no `/opt/bitnami/prometheus/data`.
+
+---
+
 ## Oracle Database 23ai Free
 
 Oracle Database corre fuera de Docker en una VM dedicada con Oracle Linux 8.10. Esta decisión replica el modelo productivo real donde las bases de datos críticas no se contienen: requieren control total de recursos, operaciones de backup/recovery dedicadas y no se benefician del modelo efímero de los contenedores.
@@ -345,6 +436,8 @@ curl -v telnet://192.168.56.20:1521
 | `solr` | `8983` | `8983` | Panel admin Solr |
 | `webdav` | `8081` | `80` | WebDAV HTTP |
 | `ldap` | — | `389 / 636` | Solo red interna Docker |
+| `ha1-int_exporter` | — | `9101` | Exporter HAProxy → Prometheus |
+| `prometheus` | `9090` | `9090` | Recolección de métricas |
 
 ### Servicios externos (fuera de Docker)
 
@@ -355,4 +448,3 @@ curl -v telnet://192.168.56.20:1521
 ---
 
 ![Arquitectura Docker appTest](docs/arq.svg)
-
