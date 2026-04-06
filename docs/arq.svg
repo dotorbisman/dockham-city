@@ -1,10 +1,10 @@
-<svg viewBox="0 0 1000 980" xmlns="http://www.w3.org/2000/svg" font-family="'Courier New', monospace">
+<svg viewBox="0 0 1000 1060" xmlns="http://www.w3.org/2000/svg" font-family="'Courier New', monospace">
 
-  <rect width="1000" height="980" fill="#0d1117"/>
+  <rect width="1000" height="1060" fill="#0d1117"/>
   <text x="500" y="36" text-anchor="middle" font-size="16" font-weight="bold" fill="#00d4ff" letter-spacing="3">appTest — ARQUITECTURA</text>
 
   <!-- ZONA DOCKER -->
-  <rect x="20" y="55" width="960" height="795" rx="8" fill="none" stroke="#444d56" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <rect x="20" y="55" width="960" height="875" rx="8" fill="none" stroke="#444d56" stroke-width="1.5" stroke-dasharray="6,3"/>
   <text x="36" y="74" font-size="11" fill="#adbac7">VM Ubuntu 24 — Docker Host</text>
   <text x="36" y="88" font-size="10" fill="#636e7b">192.168.0.x (bridge)  |  192.168.56.10 (host-only)</text>
 
@@ -28,15 +28,15 @@
   <line x1="255" y1="242" x2="175" y2="272" stroke="#00aaff" stroke-width="1.5" marker-end="url(#arr-blue)"/>
   <line x1="345" y1="242" x2="425" y2="272" stroke="#00aaff" stroke-width="1.5" marker-end="url(#arr-blue)"/>
 
-  <!-- java1 -->
+  <!-- ngx1 -->
   <rect x="80" y="272" width="190" height="44" rx="6" fill="#161b22" stroke="#00ff88" stroke-width="2"/>
-  <text x="175" y="291" text-anchor="middle" font-size="11" font-weight="bold" fill="#00ff88">java1</text>
-  <text x="175" y="307" text-anchor="middle" font-size="10" fill="#adbac7">nginx:latest  |  red interna</text>
+  <text x="175" y="291" text-anchor="middle" font-size="11" font-weight="bold" fill="#00ff88">ngx1</text>
+  <text x="175" y="307" text-anchor="middle" font-size="10" fill="#adbac7">nginx:latest  |  stub_status</text>
 
-  <!-- java2 -->
+  <!-- ngx2 -->
   <rect x="330" y="272" width="190" height="44" rx="6" fill="#161b22" stroke="#00ff88" stroke-width="2"/>
-  <text x="425" y="291" text-anchor="middle" font-size="11" font-weight="bold" fill="#00ff88">java2</text>
-  <text x="425" y="307" text-anchor="middle" font-size="10" fill="#adbac7">nginx:latest  |  red interna</text>
+  <text x="425" y="291" text-anchor="middle" font-size="11" font-weight="bold" fill="#00ff88">ngx2</text>
+  <text x="425" y="307" text-anchor="middle" font-size="10" fill="#adbac7">nginx:latest  |  stub_status</text>
 
   <!-- REDIS -->
   <rect x="30" y="342" width="560" height="110" rx="6" fill="none" stroke="#444d56" stroke-width="1" stroke-dasharray="4,2"/>
@@ -81,32 +81,32 @@
   <text x="481" y="518" text-anchor="middle" font-size="10" fill="#636e7b">:389/:636  |  dc=empresa,dc=com</text>
 
   <!-- OBSERVABILIDAD -->
-  <rect x="30" y="562" width="930" height="268" rx="6" fill="none" stroke="#444d56" stroke-width="1" stroke-dasharray="4,2"/>
+  <rect x="30" y="562" width="930" height="348" rx="6" fill="none" stroke="#444d56" stroke-width="1" stroke-dasharray="4,2"/>
   <text x="44" y="578" font-size="10" fill="#adbac7">Observabilidad</text>
 
   <!-- Exporters -->
   <rect x="44" y="586" width="148" height="68" rx="6" fill="#161b22" stroke="#ff6644" stroke-width="1.5"/>
   <text x="118" y="602" text-anchor="middle" font-size="10" font-weight="bold" fill="#ff6644">ha1-int_exporter</text>
   <text x="118" y="615" text-anchor="middle" font-size="9" fill="#adbac7">haproxy-exporter</text>
-  <text x="118" y="628" text-anchor="middle" font-size="9" fill="#636e7b">→ haproxy1-int:8404</text>
+  <text x="118" y="628" text-anchor="middle" font-size="9" fill="#636e7b">→ haproxy1-int:8404/stats;csv</text>
   <text x="118" y="641" text-anchor="middle" font-size="9" fill="#636e7b">:9101/metrics</text>
 
   <rect x="202" y="586" width="148" height="68" rx="6" fill="#161b22" stroke="#ff6644" stroke-width="1.5"/>
   <text x="276" y="602" text-anchor="middle" font-size="10" font-weight="bold" fill="#ff6644">ha1-ssl_exporter</text>
   <text x="276" y="615" text-anchor="middle" font-size="9" fill="#adbac7">haproxy-exporter</text>
-  <text x="276" y="628" text-anchor="middle" font-size="9" fill="#636e7b">→ haproxy1-ssl:8404</text>
+  <text x="276" y="628" text-anchor="middle" font-size="9" fill="#636e7b">→ haproxy1-ssl:8404/stats;csv</text>
   <text x="276" y="641" text-anchor="middle" font-size="9" fill="#636e7b">:9101/metrics</text>
 
   <rect x="360" y="586" width="148" height="68" rx="6" fill="#161b22" stroke="#44ff88" stroke-width="1.5"/>
-  <text x="434" y="602" text-anchor="middle" font-size="10" font-weight="bold" fill="#44ff88">java1_exporter</text>
+  <text x="434" y="602" text-anchor="middle" font-size="10" font-weight="bold" fill="#44ff88">ngx1_exporter</text>
   <text x="434" y="615" text-anchor="middle" font-size="9" fill="#adbac7">nginx-prom-exporter</text>
-  <text x="434" y="628" text-anchor="middle" font-size="9" fill="#636e7b">→ java1:80/stub_status</text>
+  <text x="434" y="628" text-anchor="middle" font-size="9" fill="#636e7b">→ ngx1:80/stub_status</text>
   <text x="434" y="641" text-anchor="middle" font-size="9" fill="#636e7b">:9113/metrics</text>
 
   <rect x="518" y="586" width="148" height="68" rx="6" fill="#161b22" stroke="#44ff88" stroke-width="1.5"/>
-  <text x="592" y="602" text-anchor="middle" font-size="10" font-weight="bold" fill="#44ff88">java2_exporter</text>
+  <text x="592" y="602" text-anchor="middle" font-size="10" font-weight="bold" fill="#44ff88">ngx2_exporter</text>
   <text x="592" y="615" text-anchor="middle" font-size="9" fill="#adbac7">nginx-prom-exporter</text>
-  <text x="592" y="628" text-anchor="middle" font-size="9" fill="#636e7b">→ java2:80/stub_status</text>
+  <text x="592" y="628" text-anchor="middle" font-size="9" fill="#636e7b">→ ngx2:80/stub_status</text>
   <text x="592" y="641" text-anchor="middle" font-size="9" fill="#636e7b">:9113/metrics</text>
 
   <rect x="676" y="586" width="148" height="68" rx="6" fill="#161b22" stroke="#ff4444" stroke-width="1.5"/>
@@ -122,19 +122,27 @@
   <text x="889" y="641" text-anchor="middle" font-size="9" fill="#636e7b">:9231/metrics</text>
 
   <!-- exporters → prometheus arrows -->
-  <line x1="118" y1="654" x2="118" y2="694" stroke="#ff6644" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-red)"/>
-  <line x1="276" y1="654" x2="276" y2="694" stroke="#ff6644" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-red)"/>
-  <line x1="434" y1="654" x2="434" y2="694" stroke="#44ff88" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-green)"/>
-  <line x1="592" y1="654" x2="592" y2="694" stroke="#44ff88" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-green)"/>
-  <line x1="750" y1="654" x2="750" y2="694" stroke="#ff4444" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-red2)"/>
-  <line x1="889" y1="654" x2="889" y2="694" stroke="#00ccff" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-cyan2)"/>
+  <line x1="118" y1="654" x2="118" y2="714" stroke="#ff6644" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-red)"/>
+  <line x1="276" y1="654" x2="276" y2="714" stroke="#ff6644" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-red)"/>
+  <line x1="434" y1="654" x2="434" y2="714" stroke="#44ff88" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-green)"/>
+  <line x1="592" y1="654" x2="592" y2="714" stroke="#44ff88" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-green)"/>
+  <line x1="750" y1="654" x2="750" y2="714" stroke="#ff4444" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-red2)"/>
+  <line x1="889" y1="654" x2="889" y2="714" stroke="#00ccff" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr-cyan2)"/>
 
   <!-- prometheus -->
-  <rect x="330" y="694" width="290" height="72" rx="6" fill="#161b22" stroke="#ff8800" stroke-width="2.5"/>
-  <text x="475" y="716" text-anchor="middle" font-size="12" font-weight="bold" fill="#ff8800">prometheus</text>
-  <text x="475" y="732" text-anchor="middle" font-size="10" fill="#adbac7">prom/prometheus  |  :9090→:9090</text>
-  <text x="475" y="746" text-anchor="middle" font-size="10" fill="#636e7b">reload: POST /-/reload</text>
-  <text x="475" y="760" text-anchor="middle" font-size="10" fill="#636e7b">vol: ./prome/prometheus.yml</text>
+  <rect x="230" y="714" width="290" height="72" rx="6" fill="#161b22" stroke="#ff8800" stroke-width="2.5"/>
+  <text x="375" y="736" text-anchor="middle" font-size="12" font-weight="bold" fill="#ff8800">prometheus</text>
+  <text x="375" y="752" text-anchor="middle" font-size="10" fill="#adbac7">prom/prometheus  |  :9090→:9090</text>
+  <text x="375" y="766" text-anchor="middle" font-size="10" fill="#636e7b">reload: POST /-/reload  |  vol: prometheus.yml</text>
+
+  <!-- prometheus → grafana arrow -->
+  <line x1="520" y1="750" x2="610" y2="750" stroke="#ff8800" stroke-width="1.5" marker-end="url(#arr-orange)"/>
+
+  <!-- grafana -->
+  <rect x="610" y="714" width="290" height="72" rx="6" fill="#161b22" stroke="#ff6600" stroke-width="2.5"/>
+  <text x="755" y="736" text-anchor="middle" font-size="12" font-weight="bold" fill="#ff6600">grafana</text>
+  <text x="755" y="752" text-anchor="middle" font-size="10" fill="#adbac7">grafana/grafana  |  :3000→:3000</text>
+  <text x="755" y="766" text-anchor="middle" font-size="10" fill="#636e7b">datasource: prometheus  |  vol: grafa</text>
 
   <!-- scrape dashed lines service → exporter -->
   <line x1="250" y1="217" x2="118" y2="586" stroke="#ff6644" stroke-width="0.7" stroke-dasharray="2,4"/>
@@ -144,34 +152,34 @@
   <line x1="304" y1="440" x2="750" y2="586" stroke="#ff4444" stroke-width="0.7" stroke-dasharray="2,4"/>
   <line x1="113" y1="548" x2="889" y2="586" stroke="#00ccff" stroke-width="0.7" stroke-dasharray="2,4"/>
 
-  <text x="500" y="830" text-anchor="middle" font-size="10" fill="#636e7b">red interna Docker: apptest_default</text>
+  <text x="500" y="908" text-anchor="middle" font-size="10" fill="#636e7b">red interna Docker: apptest_default</text>
 
   <!-- HOST-ONLY NETWORK -->
-  <rect x="20" y="858" width="960" height="110" rx="8" fill="none" stroke="#ff4444" stroke-width="1.5" stroke-dasharray="6,3"/>
-  <text x="36" y="876" font-size="11" fill="#ff4444">VirtualBox Host-Only Network — 192.168.56.0/24</text>
+  <rect x="20" y="938" width="960" height="110" rx="8" fill="none" stroke="#ff4444" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="36" y="956" font-size="11" fill="#ff4444">VirtualBox Host-Only Network — 192.168.56.0/24</text>
 
-  <rect x="36" y="884" width="180" height="74" rx="6" fill="#161b22" stroke="#00d4ff" stroke-width="2"/>
-  <text x="126" y="904" text-anchor="middle" font-size="11" font-weight="bold" fill="#00d4ff">Windows host</text>
-  <text x="126" y="919" text-anchor="middle" font-size="10" fill="#adbac7">192.168.56.1</text>
-  <text x="126" y="933" text-anchor="middle" font-size="10" fill="#636e7b">SSH / SQL Developer</text>
-  <text x="126" y="947" text-anchor="middle" font-size="10" fill="#636e7b">VirtualBox host</text>
+  <rect x="36" y="964" width="180" height="74" rx="6" fill="#161b22" stroke="#00d4ff" stroke-width="2"/>
+  <text x="126" y="984" text-anchor="middle" font-size="11" font-weight="bold" fill="#00d4ff">Windows host</text>
+  <text x="126" y="999" text-anchor="middle" font-size="10" fill="#adbac7">192.168.56.1</text>
+  <text x="126" y="1013" text-anchor="middle" font-size="10" fill="#636e7b">SSH / SQL Developer</text>
+  <text x="126" y="1027" text-anchor="middle" font-size="10" fill="#636e7b">VirtualBox host</text>
 
-  <rect x="380" y="884" width="220" height="74" rx="6" fill="#161b22" stroke="#00ff88" stroke-width="2"/>
-  <text x="490" y="904" text-anchor="middle" font-size="11" font-weight="bold" fill="#00ff88">VM Ubuntu 24</text>
-  <text x="490" y="919" text-anchor="middle" font-size="10" fill="#adbac7">192.168.56.10</text>
-  <text x="490" y="933" text-anchor="middle" font-size="10" fill="#636e7b">gateway / IP forwarding</text>
-  <text x="490" y="947" text-anchor="middle" font-size="10" fill="#636e7b">NAT masquerading</text>
+  <rect x="380" y="964" width="220" height="74" rx="6" fill="#161b22" stroke="#00ff88" stroke-width="2"/>
+  <text x="490" y="984" text-anchor="middle" font-size="11" font-weight="bold" fill="#00ff88">VM Ubuntu 24</text>
+  <text x="490" y="999" text-anchor="middle" font-size="10" fill="#adbac7">192.168.56.10</text>
+  <text x="490" y="1013" text-anchor="middle" font-size="10" fill="#636e7b">gateway / IP forwarding</text>
+  <text x="490" y="1027" text-anchor="middle" font-size="10" fill="#636e7b">NAT masquerading</text>
 
-  <rect x="740" y="884" width="220" height="74" rx="6" fill="#161b22" stroke="#ff4444" stroke-width="2"/>
-  <text x="850" y="904" text-anchor="middle" font-size="11" font-weight="bold" fill="#ff4444">VM Oracle Linux 8</text>
-  <text x="850" y="919" text-anchor="middle" font-size="10" fill="#adbac7">192.168.56.20  |  :1521</text>
-  <text x="850" y="933" text-anchor="middle" font-size="10" fill="#636e7b">Oracle 23ai Free</text>
-  <text x="850" y="947" text-anchor="middle" font-size="10" fill="#636e7b">SID: FREE  |  PDB: FREEPDB1</text>
+  <rect x="740" y="964" width="220" height="74" rx="6" fill="#161b22" stroke="#ff4444" stroke-width="2"/>
+  <text x="850" y="984" text-anchor="middle" font-size="11" font-weight="bold" fill="#ff4444">VM Oracle Linux 8</text>
+  <text x="850" y="999" text-anchor="middle" font-size="10" fill="#adbac7">192.168.56.20  |  :1521</text>
+  <text x="850" y="1013" text-anchor="middle" font-size="10" fill="#636e7b">Oracle 23ai Free</text>
+  <text x="850" y="1027" text-anchor="middle" font-size="10" fill="#636e7b">SID: FREE  |  PDB: FREEPDB1</text>
 
-  <line x1="216" y1="921" x2="380" y2="921" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#arr-cyan)"/>
-  <line x1="600" y1="921" x2="740" y2="921" stroke="#ff4444" stroke-width="1.5" marker-end="url(#arr-red2)"/>
-  <text x="670" y="915" text-anchor="middle" font-size="9" fill="#ff4444">:1521</text>
-  <line x1="490" y1="854" x2="490" y2="884" stroke="#00ff88" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="216" y1="1001" x2="380" y2="1001" stroke="#00d4ff" stroke-width="1.5" marker-end="url(#arr-cyan)"/>
+  <line x1="600" y1="1001" x2="740" y2="1001" stroke="#ff4444" stroke-width="1.5" marker-end="url(#arr-red2)"/>
+  <text x="670" y="995" text-anchor="middle" font-size="9" fill="#ff4444">:1521</text>
+  <line x1="490" y1="930" x2="490" y2="964" stroke="#00ff88" stroke-width="1" stroke-dasharray="3,2"/>
 
   <defs>
     <marker id="arr-cyan" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">

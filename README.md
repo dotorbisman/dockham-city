@@ -26,9 +26,19 @@ Se crearon dos instancias de HAProxy basadas en la imagen **haproxy:2.8**. Cada 
 
 **haproxy1-ssl**: recibe el tráfico externo en el puerto **443** y lo reenvía al HAProxy interno.
 
-**haproxy1-int**: recibe el tráfico del SSL por el puerto **80** y lo balancea entre los servicios Java usando round robin.
+**haproxy1-int**: recibe el tráfico del SSL por el puerto **80** y lo balancea entre los servicios Nginx usando round robin.
 
-**java1 y java2**: contenedores nginx que simulan los servicios Java reales, accesibles solo dentro de la red interna de Docker.
+**ngx1 y ngx2**: contenedores nginx que simulan los servicios Java reales, accesibles solo dentro de la red interna de Docker. Exponen el endpoint `/stub_status` mediante un archivo de configuración montado como bind mount desde `./nginx/default.conf`.
+
+```nginx
+server {
+    listen 80;
+
+    location /stub_status {
+        stub_status;
+    }
+}
+```
 
 ---
 
@@ -148,14 +158,14 @@ No se exponen puertos al host. El servicio es accesible únicamente dentro de la
 
 Al agregar LDAP al proyecto, el orden de arranque de los contenedores cambió y comenzaron a aparecer errores de resolución de nombres en los HAProxy:
 
-- `haproxy1-int` no podía resolver `java1` y `java2`
+- `haproxy1-int` no podía resolver `ngx1` y `ngx2`
 - `haproxy1-ssl` no podía resolver `haproxy1-int`
 
 La causa es que HAProxy intenta resolver los nombres de los servidores backend al momento de leer la configuración. Si el contenedor destino no está listo, falla con `could not resolve address`.
 
 **Solución:** se agregaron dependencias explícitas con `depends_on` en el docker-compose:
 
-- `haproxy1-int` depende de `java1` y `java2` con `condition: service_started`
+- `haproxy1-int` depende de `ngx1` y `ngx2` con `condition: service_started`
 - `haproxy1-ssl` depende de `haproxy1-int` con `condition: service_healthy`
 
 Para que `service_healthy` funcione, se agregó un healthcheck a `haproxy1-int` que valida la configuración con el propio binario de HAProxy:
@@ -204,16 +214,23 @@ servicio → exporter:puerto/metrics → prometheus:9090
 
 | Contenedor | Imagen | Puerto interno | Scrape target |
 |---|---|---|---|
-| `ha1-int_exporter` | `quay.io/prometheus/haproxy-exporter` | `9101` | `haproxy1-int:8404/stats` |
-| `ha1-ssl_exporter` | `quay.io/prometheus/haproxy-exporter` | `9101` | `haproxy1-ssl:8404/stats` |
-| `java1_exporter` | `nginx/nginx-prometheus-exporter` | `9113` | `java1:80/stub_status` |
-| `java2_exporter` | `nginx/nginx-prometheus-exporter` | `9113` | `java2:80/stub_status` |
+| `ha1-int_exporter` | `quay.io/prometheus/haproxy-exporter` | `9101` | `haproxy1-int:8404/stats;csv` |
+| `ha1-ssl_exporter` | `quay.io/prometheus/haproxy-exporter` | `9101` | `haproxy1-ssl:8404/stats;csv` |
+| `ngx1_exporter` | `nginx/nginx-prometheus-exporter` | `9113` | `ngx1:80/stub_status` |
+| `ngx2_exporter` | `nginx/nginx-prometheus-exporter` | `9113` | `ngx2:80/stub_status` |
 | `redis_exporter` | `oliver006/redis_exporter` | `9121` | master / slave / sentinel |
 | `solr_exporter` | `noony/prometheus-solr-exporter` | `9231` | `solr:8983` |
 
 **Nota sobre puertos:** cada tipo de exporter tiene un puerto por defecto definido por el proyecto. Ese es el puerto donde el proceso escucha dentro del contenedor — no se elige libremente. Cuando hay múltiples instancias del mismo exporter (ej: dos HAProxy), el puerto interno es siempre el mismo; si se mapea al host, se usan puertos distintos para evitar conflictos.
 
 **Nota sobre Redis:** la arquitectura es master/slave + sentinel, no un Redis Cluster. Se usa un único exporter con el patrón de múltiples targets en `prometheus.yml` via `/scrape` y `relabel_configs`.
+
+**Nota sobre HAProxy exporter:** el scrape URI debe incluir `;csv` para que el exporter reciba el formato correcto. El `;` debe pasarse como lista en el compose para evitar que el shell lo interprete como separador de comandos:
+
+```yaml
+command:
+  - "--haproxy.scrape-uri=http://haproxy1-int:8404/stats;csv"
+```
 
 ### prometheus
 
@@ -243,6 +260,59 @@ curl -X POST http://localhost:9090/-/reload
 - No existe Docker Official Image para Prometheus. La imagen oficial la publica el proyecto bajo la organización `prom`.
 - La imagen `bitnami/prometheus` fue descontinuada.
 - El path de datos es `/prometheus`.
+
+---
+
+## Observabilidad — Grafana
+
+Se incorporó Grafana como capa de visualización del stack de observabilidad. Grafana no recolecta datos — los lee desde Prometheus y los presenta en dashboards.
+
+**Imagen:** `grafana/grafana`  
+**Puerto:** `3000→3000`  
+**Volumen:** named volume `grafa` montado en `/var/lib/grafana` (datos internos manejados por Grafana, no requieren acceso directo desde el host).
+
+```yaml
+grafana:
+  container_name: grafana
+  image: grafana/grafana
+  ports:
+    - "3000:3000"
+  volumes:
+    - grafa:/var/lib/grafana
+```
+
+**Conceptos clave:**
+
+- **Datasource:** conexión entre Grafana y la fuente de datos. En este caso: Prometheus en `http://prometheus:9090`. Los servicios se comunican por nombre dentro de la red Docker.
+- **Dashboard:** pantalla compuesta por paneles. Cada panel tiene una query PromQL y un tipo de visualización.
+- **Panel:** unidad mínima visual. Puede ser una línea de tiempo, gauge, tabla, número único, etc.
+
+**Datasource configurado:**
+
+```
+Name: prometheus
+URL: http://prometheus:9090
+```
+
+### Dashboards importados
+
+Grafana permite importar dashboards de la comunidad desde [grafana.com/grafana/dashboards](https://grafana.com/grafana/dashboards) usando un ID numérico.
+
+| Dashboard | ID | Servicio |
+|---|---|---|
+| NGINX exporter | `12708` | ngx1, ngx2 |
+| HAProxy | `12693` | haproxy1-int, haproxy1-ssl |
+
+**Nota sobre el dashboard de HAProxy:** el dashboard `12693` usa una variable `host` que busca la etiqueta `instance` en la métrica `haproxy_process_nbproc`. Esta métrica no existe en el exporter legacy (`quay.io/prometheus/haproxy-exporter`). Se corrigió editando la variable desde **Settings → Variables → host** y cambiando el campo **Metric** a `haproxy_frontend_bytes_in_total`, que sí está disponible.
+
+**Recrear servicios individualmente:**
+```bash
+# Recrear un servicio sin bajar el stack completo
+docker compose up --force-recreate <nombre_servicio>
+
+# Limpiar contenedores huérfanos (servicios eliminados del compose)
+docker compose up --remove-orphans
+```
 
 ---
 
@@ -360,8 +430,8 @@ firewall-cmd --permanent --add-port=1521/tcp && firewall-cmd --reload
 | `haproxy1-ssl` | `8405` | `8404` | HAProxy SSL stats |
 | `haproxy1-int` | `443` | `80` | Balanceo interno round-robin |
 | `haproxy1-int` | `8404` | `8404` | HAProxy INT stats |
-| `java1` | — | — | Solo red interna Docker |
-| `java2` | — | — | Solo red interna Docker |
+| `ngx1` | — | — | Solo red interna Docker |
+| `ngx2` | — | — | Solo red interna Docker |
 | `redis-master` | — | `6379` | Solo red interna Docker |
 | `redis-slave` | — | `6379` | Solo red interna Docker |
 | `redis-sentinel` | — | `26379` | Solo red interna Docker |
@@ -370,11 +440,12 @@ firewall-cmd --permanent --add-port=1521/tcp && firewall-cmd --reload
 | `ldap` | — | `389 / 636` | Solo red interna Docker |
 | `ha1-int_exporter` | — | `9101` | Exporter HAProxy INT → Prometheus |
 | `ha1-ssl_exporter` | — | `9101` | Exporter HAProxy SSL → Prometheus |
-| `java1_exporter` | — | `9113` | Exporter nginx java1 → Prometheus |
-| `java2_exporter` | — | `9113` | Exporter nginx java2 → Prometheus |
+| `ngx1_exporter` | — | `9113` | Exporter nginx ngx1 → Prometheus |
+| `ngx2_exporter` | — | `9113` | Exporter nginx ngx2 → Prometheus |
 | `redis_exporter` | — | `9121` | Exporter Redis → Prometheus |
 | `solr_exporter` | — | `9231` | Exporter Solr → Prometheus |
 | `prometheus` | `9090` | `9090` | Recolección de métricas |
+| `grafana` | `3000` | `3000` | Visualización de métricas |
 
 ### Servicios externos (fuera de Docker)
 
