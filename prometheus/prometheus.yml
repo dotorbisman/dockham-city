@@ -25,7 +25,7 @@ scrape_configs:
     scrape_interval: 5s    
 
     static_configs:
-      - targets: ['java1_exporter:9113', 'java2_exporter:9113']
+      - targets: ['ngx1_exporter:9113', 'ngx2_exporter:9113']
       
   - job_name: 'redis_exporter_targets'
     scrape_interval: 5s
