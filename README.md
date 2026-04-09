@@ -1,6 +1,6 @@
 # MICROs to DOCKER
 
-![Arquitectura Docker appTest](docs/portada.png)
+![Dockham City](docs/portada.png)
 
 ## Alcance
 
@@ -8,7 +8,7 @@ _Migración de una arquitectura de microservicios Java a Docker. El objetivo es 
 
 ## Cómo levantar el ambiente
 
-Parado en la carpeta **appTest**, ejecutar `docker compose up -d`. Para bajarlo, `docker compose down`.
+Parado en la carpeta **dockham-city**, ejecutar `docker compose up -d`. Para bajarlo, `docker compose down`.
 
 ## Estructura de archivos
 
@@ -562,4 +562,4 @@ El contenedor depende de `haproxy1-int` con `condition: service_healthy` y de `r
 
 ---
 
-![Arquitectura Docker appTest](docs/arq.svg)
+![Dockham City](docs/arq.svg)

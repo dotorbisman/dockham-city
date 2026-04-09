@@ -28,7 +28,7 @@
   <rect width="1060" height="1160" fill="#1a1a2e"/>
 
   <!-- título -->
-  <text x="530" y="38" text-anchor="middle" font-size="13" font-weight="600" fill="#c8c8e0" letter-spacing="2">appTest — arquitectura</text>
+  <text x="530" y="38" text-anchor="middle" font-size="13" font-weight="600" fill="#c8c8e0" letter-spacing="2">Dockham City — arquitectura</text>
   <line x1="120" y1="44" x2="420" y2="44" stroke="#2d2d44" stroke-width="0.5"/>
   <line x1="640" y1="44" x2="940" y2="44" stroke="#2d2d44" stroke-width="0.5"/>
 
@@ -240,7 +240,7 @@
   <path d="M125 498 L937 626" fill="none" stroke="#3a8a82" stroke-width="0.6" stroke-dasharray="2 4"/>
 
   <!-- red interna label -->
-  <text x="530" y="990" text-anchor="middle" font-size="9" fill="#3a3a52">red interna Docker: apptest_default</text>
+  <text x="530" y="990" text-anchor="middle" font-size="9" fill="#3a3a52">red interna Docker: dockham-city</text>
 
   <!-- ══════════════════════════════════ -->
   <!-- HOST-ONLY NETWORK                 -->
